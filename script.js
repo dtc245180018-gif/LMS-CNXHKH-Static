@@ -8,6 +8,7 @@
     window.location.replace('login.html');
     return;
   }
+  const session = window.ICTUAuth.getSession();
   const bank = window.QUESTION_BANK;
   if (!bank || !Array.isArray(bank.lessons)) {
     document.getElementById('app').textContent = 'Không tìm thấy questions.js. Hãy mở index.html trong thư mục đầy đủ.';
@@ -34,6 +35,20 @@
   for (const k of Object.keys(defaultSaved())) if (!saved[k] || typeof saved[k]!=='object') saved[k]={};
   let ui = {page:'dashboard',lesson:1,index:0,selectedMatch:null,selectedCategory:null,resultFilter:'all'};
   let toastTimer;
+  function setupAccountBar() {
+    const roleLabel = session.role === 'admin' ? 'Quản trị viên' : 'Học viên';
+    const initials = session.name.split(/\s+/).map(part => part[0]).join('').slice(-2).toUpperCase();
+    const name = document.getElementById('profile-name');
+    const role = document.getElementById('profile-role');
+    const avatar = document.getElementById('profile-avatar');
+    const adminLink = document.getElementById('admin-link');
+    const logout = document.getElementById('logout');
+    if (name) name.textContent = session.name;
+    if (role) role.textContent = roleLabel;
+    if (avatar) avatar.textContent = initials || 'SV';
+    if (adminLink) adminLink.hidden = session.role !== 'admin';
+    if (logout) logout.addEventListener('click', window.ICTUAuth.signOut);
+  }
   const lessonById = id => bank.lessons.find(l => l.id === Number(id));
   const currentLesson = () => lessonById(ui.lesson);
   const currentQuestion = () => currentLesson()?.questions[ui.index];
@@ -338,5 +353,5 @@
     const node=el('app').querySelector('.elapsed'),start=Number(node.dataset.start);
     if(start)node.textContent=elapsed(Date.now()-start);
   },1000);
-  headerClock();render();
+  setupAccountBar();headerClock();render();
 })();
