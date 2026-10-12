@@ -46,7 +46,10 @@
     if (name) name.textContent = session.name;
     if (role) role.textContent = roleLabel;
     if (avatar) avatar.textContent = initials || 'SV';
-    if (adminLink) adminLink.hidden = session.role !== 'admin';
+    if (adminLink) {
+      adminLink.hidden = session.role !== 'admin';
+      adminLink.style.display = session.role === 'admin' ? '' : 'none';
+    }
     if (logout) logout.addEventListener('click', window.ICTUAuth.signOut);
   }
   const lessonById = id => bank.lessons.find(l => l.id === Number(id));
