@@ -4,6 +4,10 @@
 */
 (() => {
   'use strict';
+  if (!window.ICTUAuth?.getSession()) {
+    window.location.replace('login.html');
+    return;
+  }
   const bank = window.QUESTION_BANK;
   if (!bank || !Array.isArray(bank.lessons)) {
     document.getElementById('app').textContent = 'Không tìm thấy questions.js. Hãy mở index.html trong thư mục đầy đủ.';
