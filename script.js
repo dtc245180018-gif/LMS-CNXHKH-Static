@@ -109,7 +109,7 @@
   function answered(q) {
     const a=answer(q);
     if(q.type==='single')return Array.isArray(a)&&a.length===1;
-    if(q.type==='multi')return Array.isArray(a)&&a.length===q.expected;
+    if(q.type==='multi')return Array.isArray(a)&&new Set(a).size===q.expected;
     if(q.type==='tf')return Array.isArray(a)&&q.statements.every((_,i)=>a[i]==='Đúng'||a[i]==='Sai');
     if(q.type==='match')return Array.isArray(a)&&q.pairs.every((_,i)=>!!a[i]);
     if(q.type==='categorize')return categoryItems(q).every(item=>Number.isInteger(a[item.index]));
@@ -118,7 +118,10 @@
   function correct(q){
     const a=answer(q);
     if(!answered(q))return false;
-    if(q.type==='single'||q.type==='multi')return q.answers.length===a.length && q.answers.every(key=>a.includes(key));
+    if(q.type==='single'||q.type==='multi'){
+      const selected=new Set(a),expected=new Set(q.answers);
+      return selected.size===expected.size&&[...expected].every(key=>selected.has(key));
+    }
     if(q.type==='tf')return q.statements.every((s,i)=>s.answer===a[i]);
     if(q.type==='match')return q.pairs.every((s,i)=>normalize(s.answer)===normalize(a[i]));
     if(q.type==='categorize')return categoryItems(q).every(item=>Number(a[item.index])===item.group);
@@ -201,8 +204,8 @@
     if(q.type==='single'||q.type==='multi'){
       const label=q.type==='single'?'Chọn một phương án đúng nhất.':`Chọn đúng ${q.expected} phương án theo yêu cầu. Bạn đã chọn ${a.length}/${q.expected}.`;
       return hint('ⓘ '+label)+`<div class="option-list">${q.options.map(opt=>{
-        const chosen=a.includes(opt.key),isRight=q.answers.includes(opt.key),status=checked?(isRight?'good':chosen?'bad':''):'';
-        return `<button class="option ${chosen?'selected':''} ${status}" data-action="choose" data-key="${opt.key}" ${locked?'disabled':''} aria-pressed="${chosen}"><span class="option-marker">${opt.key}</span><span class="option-text">${format(opt.text)}</span>${checked&&isRight?'<span aria-label="Đáp án đúng">✓</span>':checked&&chosen?'<span aria-label="Đáp án sai">✕</span>':''}</button>`;
+        const chosen=a.includes(opt.key),isRight=q.answers.includes(opt.key),status=checked?(chosen?(isRight?'good':'bad'):isRight?'answer-key':''):'';
+        return `<button class="option ${chosen?'selected':''} ${status}" data-action="choose" data-key="${opt.key}" ${locked?'disabled':''} aria-pressed="${chosen}"><span class="option-marker">${opt.key}</span><span class="option-text">${format(opt.text)}</span>${checked&&chosen&&isRight?'<span aria-label="Đáp án đã chọn đúng">✓</span>':checked&&chosen?'<span aria-label="Đáp án đã chọn sai">✕</span>':checked&&isRight?'<span aria-label="Đáp án đúng chưa chọn">Đúng</span>':''}</button>`;
       }).join('')}</div>`;
     }
     if(q.type==='tf')return hint('ⓘ Xác định Đúng hoặc Sai cho từng phát biểu. Bạn cần trả lời tất cả các dòng.')+`<div class="tf-list">${q.statements.map((s,i)=>{
