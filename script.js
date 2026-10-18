@@ -27,6 +27,11 @@
   const clone = obj => JSON.parse(JSON.stringify(obj));
   const allQuestions = bank.lessons.flatMap(l => l.questions);
   const totalQuestions = allQuestions.length;
+  const aggregateLesson = {
+    id: 0,
+    title: 'Bài tổng hợp · Toàn bộ câu hỏi',
+    questions: allQuestions.map(q => ({...clone(q), id:`all-${q.id}`, lesson:0}))
+  };
   const mapQ = Object.fromEntries(allQuestions.map(q => [q.id,q]));
   const defaultSaved = () => ({answers:{},checked:{},submissions:{},modes:{},starts:{},orders:{},optionOrders:{}});
   let saved;
@@ -95,12 +100,15 @@
     });
   }
   const lessonById = id => {
+    if(Number(id)===aggregateLesson.id){
+      return {...aggregateLesson,questions:questionsForLesson(aggregateLesson)};
+    }
     const lesson=bank.lessons.find(l => l.id === Number(id));
     return lesson?{...lesson,questions:questionsForLesson(lesson)}:undefined;
   };
   const currentLesson = () => lessonById(ui.lesson);
   const currentQuestion = () => currentLesson()?.questions[ui.index];
-  const mode = id => saved.modes[id]||'practice';
+  const mode = id => id===aggregateLesson.id?'exam':saved.modes[id]||'practice';
   const submitted = id => !!saved.submissions[id];
   const readOnly = () => submitted(ui.lesson);
   function store(){try{localStorage.setItem(STORE,JSON.stringify(saved));}catch(e){console.warn('Local storage disabled:',e);}}
@@ -183,7 +191,8 @@
   function quiz(){
     const l=currentLesson(),q=currentQuestion(),s=lessonStats(l),i=ui.index, exam=mode(l.id)==='exam';
     if(!q)return '<p>Không có câu hỏi.</p>';
-    return `<section class="quiz-head"><div><div class="quiz-topline"><span class="tag">BÀI ${String(l.id).padStart(2,'0')}</span><span class="quiet">${l.questions.length} câu hỏi · ${exam?'Thi thử':'Luyện tập'}</span></div><h1>${escapeHTML(l.title)}</h1></div><button class="btn btn-light" data-action="home">← Tất cả bài học</button></section>
+    const lessonLabel=l.id===aggregateLesson.id?'TỔNG HỢP':`BÀI ${String(l.id).padStart(2,'0')}`;
+    return `<section class="quiz-head"><div><div class="quiz-topline"><span class="tag">${lessonLabel}</span><span class="quiet">${l.questions.length} câu hỏi · ${exam?'Thi thử':'Luyện tập'}</span></div><h1>${escapeHTML(l.title)}</h1></div><button class="btn btn-light" data-action="home">← Tất cả bài học</button></section>
     <section class="quiz-topline" style="justify-content:space-between;margin-bottom:14px"><div class="mode-switch" aria-label="Chế độ học"><button class="${!exam?'selected':''}" data-action="mode" data-mode="practice">☼ Luyện tập</button><button class="${exam?'selected':''}" data-action="mode" data-mode="exam">◷ Thi thử</button></div><span class="quiet" style="color:#728199;font-size:12px">◷ <span class="elapsed" data-start="${saved.starts[l.id]||Date.now()}">${elapsed(Date.now()-(saved.starts[l.id]||Date.now()))}</span> &nbsp; · &nbsp; Đã trả lời ${s.count}/${s.total}</span></section>
     <section class="quiz-progress"><div class="progress-track"><div class="progress-fill" style="width:${s.percent}%"></div></div></section>
     <div class="quiz-layout"><section class="content-card question-panel">
@@ -260,6 +269,9 @@
       ${rows.length?rows.map(({q,i,ok})=>`<div class="result-row"><span class="result-indicator ${ok?'ok':'no'}">${ok?'✓':'✕'}</span><div class="result-info"><strong>Câu ${q.number} · ${TYPE_LABEL[q.type]}</strong><small>${escapeHTML(q.prompt)}</small></div><button class="btn btn-light btn-xs" data-action="review-question" data-index="${i}">Xem lại →</button></div>`).join(''):'<p class="subtle">Bạn không có câu trả lời sai. Tuyệt vời!</p>'}</section>`;
   }
   function openLesson(id){
+    if(Number(id)===aggregateLesson.id&&session.role!=='admin'){
+      toast('Chỉ quản trị viên mới được mở bài tổng hợp.');return;
+    }
     const l=lessonById(id);if(!l)return;
     ui.lesson=l.id;ui.index=0;ui.selectedMatch=null;ui.selectedCategory=null;ui.resultFilter='all';
     if(mode(id)==='exam')ensureExamOrder(l);
@@ -417,4 +429,7 @@
     if(start)node.textContent=elapsed(Date.now()-start);
   },1000);
   setupAccountBar();headerClock();render();
+  if(session.role==='admin'&&new URLSearchParams(window.location.search).get('view')==='aggregate'){
+    openLesson(aggregateLesson.id);
+  }
 })();

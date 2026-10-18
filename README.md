@@ -30,6 +30,7 @@ Hệ thống luyện tập LMS (giao diện tiếng Việt) chạy hoàn toàn b
 - **Kéo thả phân loại**: kéo hoặc chạm thẻ rồi chạm vào cột tương ứng.
 - **Luyện tập**: chọn đáp án và kiểm tra theo từng câu.
 - **Thi thử**: mỗi lượt thi sẽ xáo trộn thứ tự câu hỏi và các phương án trả lời, nộp bài để chấm và xem đáp án sau khi kết thúc. Số câu gốc trong tài liệu vẫn được hiển thị ở cuối tiêu đề từng câu.
+- **Bài tổng hợp quản trị**: tài khoản admin có thể mở bài thi thử gồm toàn bộ 251 câu từ Dashboard admin; bài này luôn xáo trộn câu hỏi và đáp án, đồng thời dùng vùng lưu đáp án riêng.
 - Điều hướng nhanh giữa các câu, tiến độ, điểm, thời gian, xem câu sai, **xuất kết quả CSV**, làm lại bài.
 - Lưu tiến độ và kết quả bằng `localStorage` của trình duyệt (không đồng bộ máy khác).
 
