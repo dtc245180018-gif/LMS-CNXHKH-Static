@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102445">
+  <meta name="description" content="Hệ thống học tập Chủ nghĩa xã hội khoa học – 6 bài, 251 câu hỏi, chấm điểm trực tiếp, học offline.">
+  <title>ICTU Learn • Chủ nghĩa xã hội khoa học</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="auth.js"></script>
+  <script>
+    if (!window.ICTUAuth.getSession()) window.location.replace('login.html');
+  </script>
+  <script defer src="questions.js?v=2"></script>
+  <script defer src="script.js?v=4"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <button class="brand" data-action="home" aria-label="Trang chủ">
+        <span class="brand-icon">✦</span><span><strong>ICTU<span class="brand-light">LEARN</span></strong><small>LEARNING MANAGEMENT SYSTEM</small></span>
+      </button>
+      <div class="sidebar-label">KHÔNG GIAN HỌC TẬP</div>
+      <nav class="side-nav" aria-label="Điều hướng chính">
+        <button class="side-link active" data-action="home" data-nav="home"><span class="side-ico">▦</span> Tổng quan <span class="side-arrow">›</span></button>
+        <button class="side-link" data-action="all-lessons" data-nav="lessons"><span class="side-ico">▤</span> Khóa học <span class="side-arrow">›</span></button>
+      </nav>
+      <div class="sidebar-label" style="margin-top:28px">NỘI DUNG KHÓA HỌC</div>
+      <nav class="side-nav" id="lesson-nav" aria-label="Danh sách 6 bài"></nav>
+      <div class="side-footer"><div class="online-mark"></div><div><strong>Học tập ngoại tuyến</strong><small>Dữ liệu được lưu trên trình duyệt</small></div></div>
+    </aside>
+    <div class="main-wrap">
+      <header class="topbar">
+        <div class="topbar-left"><button class="mobile-menu" data-action="toggle-menu" aria-label="Mở menu">☰</button><span class="breadcrumb" id="breadcrumb">Trang chủ <span>/</span> Tổng quan</span></div>
+        <div class="top-actions"><span class="clock" id="live-clock"></span><a class="btn btn-light btn-xs" id="admin-link" href="admin.html" hidden>Quản trị</a><span class="profile-avatar" id="profile-avatar" title="Tài khoản">SV</span><div class="profile-name"><strong id="profile-name">Học viên</strong><small id="profile-role">Chế độ học tập</small></div><button class="btn btn-light btn-xs" id="logout" type="button">Đăng xuất</button></div>
+      </header>
+      <main id="app" class="page-container" tabindex="-1" aria-live="polite"></main>
+      <footer class="page-footer"><span>ICTU LEARN · Chủ nghĩa xã hội khoa học</span><span>6 bài học · Ngân hàng 251 câu · Hoạt động offline</span><span class="developer-credit">Dev by Ngọc Thắng <span class="verified-badge" aria-label="Đã xác minh">✓</span></span></footer>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
